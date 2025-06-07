@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-# Install system dependencies in a single layer
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
