@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import logging
 from webdriver_manager.chrome import ChromeDriverManager
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,6 +40,29 @@ def get_driver():
         chrome_options.add_argument(
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
+
+        # List possible Chrome binary locations
+        chrome_binary_locations = [
+            "/usr/bin/google-chrome",
+            "/usr/bin/google-chrome-stable",
+            "/usr/lib/chromium-browser/chrome",
+            "/usr/lib/chromium/chrome",
+            "/opt/google/chrome/google-chrome",
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",  # Windows
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"  # Windows
+        ]
+        chrome_binary_found = False
+        for binary_path in chrome_binary_locations:
+            if os.path.exists(binary_path):
+                chrome_options.binary_location = binary_path
+                logger.info(f"Chrome binary found at: {binary_path}")
+                chrome_binary_found = True
+                break
+
+        if not chrome_binary_found:
+            st.error("Chrome binary not found in standard locations. Please ensure Google Chrome is installed.")
+            logger.error("Chrome binary not found in standard locations. Checked: " + ", ".join(chrome_binary_locations))
+            return None
 
         # Use ChromeDriverManager to install ChromeDriver
         service = Service(ChromeDriverManager().install())
@@ -141,11 +165,15 @@ def scrape_posts(driver, url):
                 if likes_elements:
                     likes_text = likes_elements[0].text.strip()
                     if likes_text:
-                        # Handle formats like "1K", "1,234", etc.
-                        if 'K' in likes_text:
-                            likes_count = int(float(likes_text.replace('K', '')) * 1000)
-                        else:
-                            likes_count = int(likes_text.replace(',', ''))
+                        try:
+                            # Handle formats like "1K", "1,234", etc.
+                            if 'K' in likes_text:
+                                likes_count = int(float(likes_text.replace('K', '')) * 1000)
+                            else:
+                                likes_count = int(likes_text.replace(',', ''))
+                        except ValueError as e:
+                            logger.warning(f"Post {i}: Failed to parse likes '{likes_text}': {str(e)}")
+                            likes_count = 0
                 logger.info(f"Post {i}: Likes - {likes_count}")
 
                 result.append({
