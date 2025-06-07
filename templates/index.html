@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LinkedIn Post Scraper</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        h1 { color: #0073b1; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { background-color: #0073b1; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        button:hover { background-color: #005582; }
+        .error { color: red; }
+        .success { color: green; }
+        .post { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    </style>
+</head>
+<body>
+<h1>🔍 LinkedIn Post Scraper</h1>
+<p>This tool helps you scrape your LinkedIn posts and convert them to JSON format</p>
+
+<form method="POST">
+    <div class="form-group">
+        <label for="email">LinkedIn Email</label>
+        <input type="text" id="email" name="email" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-group">
+        <label for="profile_url">Profile URL</label>
+        <input type="text" id="profile_url" name="profile_url" placeholder="https://www.linkedin.com/in/username/" required>
+    </div>
+    <button type="submit">Scrape Posts</button>
+</form>
+
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
+
+{% if posts %}
+<p class="success">Found {{ posts|length }} posts</p>
+{% for post in posts[:3] %}
+<div class="post">
+    <strong>Post {{ loop.index }} ({{ post.likes }} likes)</strong>
+    <p>{{ post.text }}</p>
+    <hr>
+</div>
+{% endfor %}
+<a href="/download">Download JSON</a>
+{% endif %}
+
+<hr>
+<p><small>Note: This tool is for educational purposes only. Use responsibly and be aware that scraping may violate LinkedIn's Terms of Service.</small></p>
+</body>
+</html>

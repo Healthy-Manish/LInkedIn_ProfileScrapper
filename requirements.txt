@@ -1,4 +1,4 @@
-streamlit
+flask
 selenium
 beautifulsoup4
 webdriver-manager
