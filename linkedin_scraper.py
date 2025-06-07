@@ -40,16 +40,11 @@ def get_driver():
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
 
-        # Try to use system ChromeDriver, fall back to ChromeDriverManager
-        try:
-            service = Service("/usr/lib/chromium-browser/chromedriver")
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-        except:
-            from webdriver_manager.chrome import ChromeDriverManager
-            service = Service(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-
+        # Use ChromeDriverManager to install ChromeDriver
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.set_page_load_timeout(30)
+        logger.info("WebDriver initialized successfully")
         return driver
     except Exception as e:
         st.error(f"Failed to initialize WebDriver: {str(e)}")
