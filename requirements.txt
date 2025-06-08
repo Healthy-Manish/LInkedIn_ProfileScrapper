@@ -1,4 +1,4 @@
-
+#requirement imports
 flask
 selenium
 beautifulsoup4
